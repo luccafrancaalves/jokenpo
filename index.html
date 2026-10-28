@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jokenpô 🎮</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, sans-serif
+    }
+   
+    body {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        padding: 20px;
+    }
+    
+    .container {
+        background: #fff;
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 560px;
+        width: 100%;
+        box-shadow: 0 20px 50px rgba(0,0,0, 0.3);
+        text-align: center;
+    }
+
+    h1 {
+        color: #1e3c72;
+        margin-bottom: 8px;
+        font-size: 1.9rem;
+    }
+
+    .subtitulo {
+        color: #666;
+        font-size: 0.95rem;
+        margin-bottom: 22px;
+    }
+
+    .placar {
+        display: flex;
+        justify-content: space-around;
+        background: #f0f4ff;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 18px;
+    }
+
+    .placar-item span {
+        display: block;
+        font-size: 0.75rem;
+        color: #777;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .placar-item strong {
+        font-size: 1.6rem;
+        color: #1e3c73;
+    }
+    
+    .rodada-info {
+        font-size: 0.95rem;
+        color: #1e3c72;
+        font-weight: 12px;
+        margin-bottom: 12px;
+    }
+
+    .barra-progresso {
+        height: 8px;
+        background: #e0e5f5;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 22px;
+    }
+
+    .barra-progresso div {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #1e3c72, #2a5298);
+        transition: width 0.4s ease;
+    }
+
+    .opcoes {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .opcao-btn {
+        background: #f0f4ff;
+        border: 3px solid transparent;
+        border-radius: 15px;
+        padding: 18px 12px;
+        cursor: pointer;
+        transition: 0.2;
+        font-size: 2.2rem;
+        width: 100px;
+    }
+    
+    .opcao-btn:hover:not(:disabled) {
+        background: #dbe3ff;
+        transform: translateY(-4px);
+        border-color: #1e3c72;
+    }
+    
+    .opcao-btn:disabled{
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .opcao-btn small {
+        display: block;
+        font-size: 0.7rem;
+        color: #555;
+        margin-top: 5px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .confronto {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        background: #fafbff;
+        border-radius: 12ps;
+        padding: 18px;
+        margin-bottom: 18px;
+        min-height: 100px;
+    }
+
+    .lado {
+        flex: 1;
+    }
+
+    .lado small {
+        display: block;
+        color: #888;
+        font-size: 0.75rem;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+
+    .lado .emoji {
+        font-size: 2.5rem;
+    }
+
+    .vs {
+        font-weight: bold;
+        color: #1e3c72;
+        font-size: 1.2rem;
+        padding: 0 10px;
+    }
+
+    #mensagem {
+        min-height: 55px;
+        padding: 15px;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+    }
+
+    .msg-neutra {
+        background: #f0f4ff;
+        color: #1e3c72
+    }
+
+    .msg-vitoria {
+        background: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .msg-derrota{
+        background: #f8d7da;
+        color: #842029;
+    }
+
+    .msg-empate {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .btn-reiniciar {
+        background: #28a745;
+        color: #fff;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        display: none;
+    }
+
+    .btn-reiniciar:hover {
+        background: #1f8a37;
+        transform: translateY(-2px);
+    }
+</style>
+</head>
+
+<body>
+    
+    <div class="container">
+        <h1>🎮 Jokenpô</h1>
+        <p class="subtitulo".>Melhor de 5 rodadas - Pedra, Papel ou Tesoura!</p>
+
+        <div class="placar">
+            <div class="placar-item">
+            <span>Você</span>
+            <strong id="placarJogador">0</strong>    
+            </div>
+            <div class="placar-item">
+                <span>Empates</span>
+                <strong id="placarEmpates">0</strong>
+            </div>
+            <div class="placar-item">
+                <span>PC</span>
+                <strong id="placarPC">0</strong>
+            </div>
+        </div>
+
+        <div class="rodada-info">
+            Rodada <span id="rodadaAtual">1</span> de <span id="totalRodadas">5</span>
+        </div>
+        <div class="barra-progresso">
+            <div id="progresso"></div>
+        </div>
+
+        <div class="opcoes">
+            <button class="opcao-btn" data-escolha="pedra" id="btnPedra">
+                ✊<small>Pedra</small>
+            </button>
+            <buttom class="opcao-btn" data-escolha="papel" id="btnPapel">
+                ✋<small>Papel</small>
+            </buttom>
+            <butto class="opcao-btn" data-escolha="tesoura" id="btnTesoura">
+                ✌️<small>Tesoura</small>
+            </butto>
+        </div>
+
+        <div class="confronto">
+            <div class="lado">
+                <small>Você</small>
+                <div class="emoji" id="emojiJogador">❔</div>
+            </div>
+            <div class="vs">VS</div>
+            <div class="lado">
+                <small>Computador</small>
+                <div class="emoji" id="emojiPC">❔</div>
+            </div>
+        </div>
+
+        <div id="mensagem" class="msg-neutra">
+            Escolha sua jogada! 🚀
+        </div>
+
+        <button class="btn-reiniciar" id="btnReiniciar">🔄 Jogar Novamente</button>
+    </div>
+
+    <script>
+         // ===== CONFIGURAÇÕES =====
+        const TOTAL_RODADAS = 5;
+        const opcoes = ["pedra", "papel", "tesoura"];
+        const emojis = {
+            pedra: "✊",
+            papel: "✋",
+            tesoura: "✌️"
+        };
+
+        // ===== ESTADO DO JOGO =====
+        let rodada;
+        let vitoriasJogador;
+        let vitoriasPC;
+        let empates;
+        let jogoAtivo;
+
+        // ===== REFERÊNCIAS =====
+        const placarJogador = document.getElementById('placarJogador');
+        const placarPC = document.getElementById('placarPC');
+        const placarEmpates = document.getElementById('placarEmpates');
+        const rodadaAtual = document.getElementById('rodadaAtual');
+        const totalRodadas = document.getElementById('totalRodadas');
+        const progresso = document.getElementById('progresso');
+        const mensagem = document.getElementById('mensagem');
+        const emojiJogador = document.getElementById('emojiJogador');
+        const emojiPC = document.getElementById('emojiPC');
+        const btnReiniciar = document.getElementById('btnReiniciar');
+        const botoesOpcao = document.querySelectorAll('.opcao-btn');
+
+        // ===== INICIA / REINICIA =====
+        function iniciarJogo() {
+            rodada = 1;
+            vitoriasJogador = 0;
+            vitoriasPC = 0;
+            empates = 0;
+            jogoAtivo = true;
+
+            // Reset visual
+            placarJogador.textContent = 0;
+            placarPC.textContent = 0;
+            placarEmpates.textContent = 0;
+            rodadaAtual.textContent = rodada;
+            totalRodadas.textContent = TOTAL_RODADAS;
+            progresso.style.width = '0%';
+            emojiJogador.textContent = '❔';
+            emojiPC.textContent = '❔';
+            mensagem.textContent = 'Escolha sua jogada! 🚀';
+            mensagem.className = 'msg-neutra';
+            btnReiniciar.style.display = 'none';
+
+            botoesOpcao.forEach(btn => btn.disabled = false);
+        }
+
+        // ===== ATUALIZA PLACAR =====
+        function atualizarPlacar() {
+            placarJogador.textContent = vitoriasJogador;
+            placarPC.textContent = vitoriasPC;
+            placarEmpates.textContent = empates;
+            rodadaAtual.textContent = Math.min(rodada, TOTAL_RODADAS);
+            progresso.style.width = ((Math.min(rodada - 1, TOTAL_RODADAS)) / TOTAL_RODADAS * 100) + '%';
+        }
+
+        // ===== VERIFICA RESULTADO DA RODADA =====
+        function verificarResultado(jogador, pc) {
+            if (jogador === pc) return 'empate';
+
+            if (
+                (jogador === 'pedra' && pc === 'tesoura') ||
+                (jogador === 'papel' && pc === 'pedra') ||
+                (jogador === 'tesoura' && pc === 'papel')
+            ) return 'vitoria';
+
+            return 'derrota';
+        }
+
+        // ===== EXECUTA UMA RODADA =====
+        function jogarRodada(escolhaJogador) {
+            if (!jogoAtivo) return;
+
+            // Computador escolhe
+            const escolhaPC = opcoes[Math.floor(Math.random() * opcoes.length)];
+
+            // Mostra as escolhas
+            emojiJogador.textContent = emojis[escolhaJogador];
+            emojiPC.textContent = emojis[escolhaPC];
+
+            // Verifica quem ganhou
+            const resultado = verificarResultado(escolhaJogador, escolhaPC);
+
+            if (resultado === 'vitoria') {
+                vitoriasJogador++;
+                mensagem.textContent = `✅ Você ganhou! ${escolhaJogador} vence ${escolhaPC}.`;
+                mensagem.className = 'msg-vitoria';
+            } else if (resultado === 'derrota') {
+                vitoriasPC++;
+                mensagem.textContent = `❌ Você perdeu! ${escolhaPC} vence ${escolhaJogador}.`;
+                mensagem.className = 'msg-derrota';
+            } else {
+                empates++;
+                mensagem.textContent = `🤝 Empate! Ambos escolheram ${escolhaJogador}.`;
+                mensagem.className = 'msg-empate';
+            }
+
+            // Avança contador de rodada
+            rodada++;
+
+            // Atualiza placar e barra
+            atualizarPlacar();
+
+            // Verifica se o jogo acabou
+            if (rodada > TOTAL_RODADAS) {
+                finalizarJogo();
+            }
+        }
+
+        // ===== FINALIZA O JOGO =====
+        function finalizarJogo() {
+            jogoAtivo = false;
+            progresso.style.width = '100%';
+            botoesOpcao.forEach(btn => btn.disabled = true);
+            btnReiniciar.style.display = 'inline-block';
+
+            let textoFinal = '';
+            if (vitoriasJogador > vitoriasPC) {
+                textoFinal = `🏆 PARABÉNS! Você venceu o jogo por ${vitoriasJogador} a ${vitoriasPC}!`;
+                mensagem.className = 'msg-vitoria';
+            } else if (vitoriasJogador < vitoriasPC) {
+                textoFinal = `😢 O computador venceu por ${vitoriasPC} a ${vitoriasJogador}. Tente novamente!`;
+                mensagem.className = 'msg-derrota';
+            } else {
+                textoFinal = `🤝 Empate geral! Placar: ${vitoriasJogador} x ${vitoriasPC}.`;
+                mensagem.className = 'msg-empate';
+            }
+            mensagem.textContent = textoFinal;
+        }
+
+        // ===== EVENTOS =====
+        botoesOpcao.forEach(btn => {
+            btn.addEventListener('click', () => {
+                jogarRodada(btn.dataset.escolha);
+            });
+        });
+
+        btnReiniciar.addEventListener('click', iniciarJogo);
+
+        // Inicia ao carregar
+        iniciarJogo();
+    </script>
+</body>
+
+</html>
